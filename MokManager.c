@@ -1021,18 +1021,20 @@ static INTN mok_enrollment_prompt (void *MokNew, UINTN MokNewSize, int auth,
 {
 	EFI_GUID shim_lock_guid = SHIM_LOCK_GUID;
 	EFI_STATUS efi_status;
-	CHAR16 *title;
+	//CHAR16 *title;
 
+	/*
 	if (MokX)
 		title = L"[Enroll MOKX]";
 	else
 		title = L"[Enroll MOK]";
-
+	
 	if (list_keys(MokNew, MokNewSize, title) != EFI_SUCCESS)
 		return 0;
 
 	if (console_yes_no((CHAR16 *[]){L"Enroll the key(s)?", NULL}) == 0)
 		return 0;
+	*/
 
 	efi_status = store_keys(MokNew, MokNewSize, auth, MokX);
 
@@ -2472,9 +2474,15 @@ static EFI_STATUS check_mok_request(EFI_HANDLE image_handle)
 		console_error(L"Could not retrieve MokXDel", status);
 	}
 
-	enter_mok_menu(image_handle, MokNew, MokNewSize, MokDel, MokDelSize,
+
+	if (MokNew) {
+		mok_enrollment_prompt(MokNew, MokNewSize, TRUE, FALSE);
+	}
+	else {
+		enter_mok_menu(image_handle, MokNew, MokNewSize, MokDel, MokDelSize,
 		       MokSB, MokSBSize, MokPW, MokPWSize, MokDB, MokDBSize,
 		       MokXNew, MokXNewSize, MokXDel, MokXDelSize);
+	}
 
 	if (MokNew)
 		FreePool (MokNew);
